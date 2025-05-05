@@ -22,27 +22,41 @@ class FSM(StateMachine):
             raise ValueError("Passenger Location and Destination can't be InTaxi")
 
     def transition(self, data: tuple[int, int], action: ActionEnum):
-        row, col = data
+
+        # Starting the FSM
         if self.current_state == self.idle:
             self.start()
-        match action:
-            case ActionEnum.south if row < 4:
-                row += 1
-            case ActionEnum.north if row > 0:
-                row -= 1
-            case ActionEnum.east if col < 4:
-                col += 1
-            case ActionEnum.west if col > 0:
-                col -= 1
-            case ActionEnum.pickup if data == self.pass_location.value and self.pass_location != LocationEnum.InTaxi:
+        moved = True
+
+        # If Action is Move
+        if any(action == loc for loc in ActionEnum if (loc != ActionEnum.pickup and loc != ActionEnum.dropoff)):
+            data, moved = move_case(action, data)
+
+        # If Action is Pickup or Dropoff
+        else:
+            if action == ActionEnum.pickup and data == self.pass_location.value and self.pass_location != LocationEnum.InTaxi:
                 self.pass_location = LocationEnum.InTaxi
-                return data
-            case ActionEnum.dropoff if data == self.destination.value and self.pass_location == LocationEnum.InTaxi:
+            elif action == ActionEnum.dropoff and data == self.destination.value and self.pass_location == LocationEnum.InTaxi:
                 self.pass_location = self.destination
                 self.finish()
-                return data
-            case _ if self.current_state == self.active:
-                self.pause()
-                return data
-        return (row, col)
 
+        # If None of the Above are Satisfied
+        if not moved:
+            self.pause()
+            raise ValueError("Invalid Action")
+        return data
+
+def move_case(action: ActionEnum, data: tuple[int, int]) -> (tuple[int, int], bool):
+    col, row = data
+    match action:
+        case ActionEnum.south if col < 4:
+            col += 1
+        case ActionEnum.north if col > 0:
+            col -= 1
+        case ActionEnum.east if row < 4:
+            row += 1
+        case ActionEnum.west if row > 0:
+            row -= 1
+        case _:
+            return data, False
+    return (col, row), True
