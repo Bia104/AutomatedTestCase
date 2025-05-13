@@ -5,8 +5,8 @@ import os
 
 env = TaxiGymEnv()
 
-log_path = "../ppo_logs/"
-model_path = "../ppo_taxi_models/"
+log_path = "../ppo_elements/logs/"
+model_path = "../ppo_elements/models/"
 
 model = PPO("MultiInputPolicy", env, verbose=1)
 #model = PPO.load(os.path.join(model_path, "best_model"), env=env)

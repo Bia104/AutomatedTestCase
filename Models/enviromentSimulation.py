@@ -25,12 +25,10 @@ class TaxiGymEnv(gymnasium.Env):
             "current_objective": spaces.MultiDiscrete([5, 5]),
         })
 
-        # Unchanging Stats
-        self.start_pos = (int(np.random.choice(range(0,5))), int(np.random.choice(range(0,5))))
-
         # Randomized Stats
         self.final_dest, self.pass_loc = get_random_pickup_and_dropoff()
         self.fsm = FSM(self.final_dest, self.pass_loc)
+        self.start_pos = (int(np.random.choice(range(0, 5))), int(np.random.choice(range(0, 5))))
 
         # Changing Stats
         self.taxi_loc = self.start_pos
@@ -65,10 +63,10 @@ class TaxiGymEnv(gymnasium.Env):
 
         old_loc = self.taxi_loc
         action = ActionEnum(action_id)
+        self.steps += 1
 
         try:
             self.taxi_loc = self.fsm.transition(self.taxi_loc, action)
-            self.steps += 1
 
             if self.taxi_loc == self.current_objective:
                 self.hovering += 1
@@ -108,7 +106,6 @@ class TaxiGymEnv(gymnasium.Env):
                     reward = 1000
                 else:
                     reward = 5000
-                print("COMPLETED!")
             elif truncated:
                 reward = -5000
 
@@ -171,7 +168,7 @@ def get_random_pickup_and_dropoff() -> tuple[LocationEnum, LocationEnum]:
     dropoff = np.random.choice([l for l in valid if l != pickup])
     return pickup, dropoff
 
-# Check if the taxi is at a new corner
+# Check if the taxi is in a new corner
 def new_corner(taxi_loc: tuple[int, int], visited: set[tuple[int, int]]) -> bool:
     return taxi_loc not in visited and taxi_loc in {loc for loc in LocationEnum if loc != LocationEnum.InTaxi}
 

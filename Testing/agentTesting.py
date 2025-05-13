@@ -3,7 +3,7 @@ from stable_baselines3 import PPO
 from Models.enviromentSimulation import TaxiGymEnv
 
 env = TaxiGymEnv()
-model = PPO.load("C:/Users/cerin/PycharmProjects/AutomatedTestCase/ppo_taxi_models/best_model", env = env)
+model = PPO.load("../ppo_elements/models/best_model", env = env)
 
 ratio = 0.0
 avg_steps = 0
