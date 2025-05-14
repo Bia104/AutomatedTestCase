@@ -1,6 +1,7 @@
 from stable_baselines3 import PPO
 
-from Models.enviromentSimulation import TaxiGymEnv
+from Models.environment_simulation import TaxiGymEnv
+
 
 env = TaxiGymEnv()
 model = PPO.load("../ppo_elements/models/best_model", env = env)

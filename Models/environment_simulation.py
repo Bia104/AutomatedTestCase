@@ -3,9 +3,9 @@ import numpy as np
 import gymnasium
 from gymnasium import spaces
 
-from Models.Enumerations.actionEnumeration import ActionEnum
-from Models.Enumerations.locationEnumeration import LocationEnum
-from Models.finiteStateMachine import FSM
+from Models.Enumerations.actions import ActionEnum
+from Models.Enumerations.locations import LocationEnum
+from Models.finite_state_machine import FSM
 
 
 class TaxiGymEnv(gymnasium.Env):
@@ -177,4 +177,3 @@ def closest_unvisited_corner(current_loc, visited):
     if not unvisited_corners:
         return float('inf')  # No unvisited corners left
     return min(manhattan(current_loc, corner.value) for corner in unvisited_corners)
-

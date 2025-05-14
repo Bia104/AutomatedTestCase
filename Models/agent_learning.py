@@ -1,6 +1,6 @@
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
-from Models.enviromentSimulation import TaxiGymEnv
+from Models.environment_simulation import TaxiGymEnv
 import os
 
 env = TaxiGymEnv()

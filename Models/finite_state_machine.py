@@ -1,7 +1,7 @@
 from statemachine import StateMachine, State
 
-from Models.Enumerations.actionEnumeration import ActionEnum
-from Models.Enumerations.locationEnumeration import LocationEnum
+from Models.Enumerations.actions import ActionEnum
+from Models.Enumerations.locations import LocationEnum
 
 
 class FSM(StateMachine):

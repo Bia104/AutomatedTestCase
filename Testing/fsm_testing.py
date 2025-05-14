@@ -1,6 +1,7 @@
-from Models.Enumerations.actionEnumeration import ActionEnum
-from Models.Enumerations.locationEnumeration import LocationEnum
-from Models.finiteStateMachine import FSM
+from Models.Enumerations.actions import ActionEnum
+from Models.Enumerations.locations import LocationEnum
+from Models.finite_state_machine import FSM
+
 
 fsm = FSM(final_state=LocationEnum.Blue, pass_loc=LocationEnum.Red)
 pos = (0, 0)

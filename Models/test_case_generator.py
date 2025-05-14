@@ -2,7 +2,8 @@ import json
 import numpy as np
 from stable_baselines3 import PPO
 
-from Models.Enumerations.actionEnumeration import ActionEnum
+from Models.Enumerations.actions import ActionEnum
+from Models.coverage_mapper import CoverageMapper
 
 
 class TestCaseGenerator:
@@ -12,8 +13,10 @@ class TestCaseGenerator:
         self.num_cases = num_cases
         self.test_cases = []
 
-    def generate(self, path="../test_cases/generated_test_cases.json"):
-        for _ in range(self.num_cases):
+    def generate(self, path: str ="../test_cases/generated_test_cases.json"):
+        mapper = CoverageMapper()
+        for i in range(self.num_cases):
+            mapper.begin_test(i)
             obs, _ = self.env.reset()
             steps = []
             done = False
@@ -33,6 +36,7 @@ class TestCaseGenerator:
                 total_reward += reward
 
             test_case = {
+                "id": i,
                 "start": start,
                 "pickup": pickup,
                 "destination": obs["destination"],
@@ -43,6 +47,8 @@ class TestCaseGenerator:
             }
 
             self.test_cases.append(test_case)
-        # Saving the Test Cases
+            mapper.end_test()
+
+        mapper.save_map()
         with open(path, "w") as f:
             json.dump(self.test_cases, f, indent=4)

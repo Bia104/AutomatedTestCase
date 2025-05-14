@@ -1,4 +1,5 @@
-from Models.enviromentSimulation import TaxiGymEnv
+from Models.environment_simulation import TaxiGymEnv
+
 
 env = TaxiGymEnv()
 obs, info = env.reset()

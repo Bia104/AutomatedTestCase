@@ -1,8 +1,9 @@
 import json
 
-from Models.enviromentSimulation import TaxiGymEnv
-from Models.testCaseGenerator import TestCaseGenerator
-from Models.testCaseRunner import TestCaseRunner
+from Models.environment_simulation import TaxiGymEnv
+from Models.test_case_generator import TestCaseGenerator
+from Models.test_case_runner import TestCaseRunner
+
 
 env = TaxiGymEnv()
 
@@ -20,4 +21,4 @@ print("Running test cases...")
 runner = TestCaseRunner(model_path, output_path)
 results = runner.run_all()
 success_rate = sum(1 for r in results if r) / len(results)
-print(f" Test run complete: {len(results)} cases, {success_rate:.2%} success rate")
+print(f"Test run complete: {len(results)} cases, {success_rate:.2%} success rate")
