@@ -1,5 +1,3 @@
-import json
-
 from Models.environment_simulation import TaxiGymEnv
 from Models.test_case_generator import TestCaseGenerator
 from Models.test_case_runner import TestCaseRunner

@@ -1,5 +1,5 @@
-from Models.prioritization import TestCasePrioritizer
+from Models.prioritization import Prioritizer
 
-prioritizer = TestCasePrioritizer("../test_cases/generated_test_cases.json")
+prioritizer = Prioritizer("../test_cases/generated_test_cases.json")
 for test_case in prioritizer.prioritize():
     print(test_case)

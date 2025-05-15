@@ -1,13 +1,11 @@
+import ast
 import json
 import os
-
 import coverage
-import ast
-import inspect
 from typing import List, Dict, Set
 
 
-def build_function_map(root: str) -> Dict[str, List[tuple[str, int, int]]]:
+def build_function_map(root: str) -> dict[str, dict[str, list[tuple[int, int]]]]:
     func_map: Dict[str, List[tuple[str, int, int]]] = {}
     for dirpath, _, filenames in os.walk(root):
         for fn in filenames:
@@ -25,8 +23,19 @@ def build_function_map(root: str) -> Dict[str, List[tuple[str, int, int]]]:
                         default=start
                     )
                     funcs.append((node.name, start, end))
-            func_map[path] = funcs
-    return func_map
+            if len(funcs) > 0:
+                func_map[path] = funcs
+    return save_lines_map(func_map)
+
+
+def save_lines_map(func_map: dict[str, list[tuple[str, int, int]]], path: str = "../test_cases/lines_map.json") -> dict[str, dict[str, list[tuple[int, int]]]]:
+    lines = []
+    line = {file_path.split("\\")[2]: {name: (start, end) for name, start, end in funcs} for file_path, funcs in func_map.items()}
+    lines.append(line)
+    lines = {k: v for d in lines for k, v in d.items()}
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(lines, f, indent=2)
+    return json.load(open(path, "r"))
 
 
 class CoverageMapper:
@@ -36,6 +45,7 @@ class CoverageMapper:
     def __init__(self, source_root: str = "..\\Models"):
         self.cov = coverage.Coverage(data_file=None, omit=["*/site-packages/*"])
         self.func_map = build_function_map(source_root)
+        self.root = source_root
         self.coverage_map: Dict[int, Set[str]] = {}
         self.current_test_id = -1
 
@@ -52,11 +62,10 @@ class CoverageMapper:
         data = self.cov.get_data()
         covered_funcs: Set[str] = set()
         for file_path, funcs in self.func_map.items():
-            lines = data.lines(os.path.abspath(file_path)) or []
-            for func_name, start, end in funcs:
-                if any(start <= ln <= end for ln in lines):
+            lines = data.lines(os.path.abspath(os.path.join(self.root, file_path))) or []
+            for func_name in funcs:
+                if any(funcs[func_name][0] <= ln <= funcs[func_name][1] for ln in lines) and func_name != "end_test":
                     covered_funcs.add(func_name)
-
         self.coverage_map[self.current_test_id] = covered_funcs
         self.cov.erase()
 
