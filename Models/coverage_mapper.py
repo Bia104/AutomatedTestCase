@@ -5,7 +5,7 @@ import coverage
 from typing import List, Dict, Set
 
 
-def build_function_map(root: str) -> dict[str, dict[str, list[tuple[int, int]]]]:
+def build_function_map(root: str, save_path: str) -> dict[str, dict[str, list[tuple[int, int]]]]:
     func_map: Dict[str, List[tuple[str, int, int]]] = {}
     for dirpath, _, filenames in os.walk(root):
         for fn in filenames:
@@ -25,10 +25,10 @@ def build_function_map(root: str) -> dict[str, dict[str, list[tuple[int, int]]]]
                     funcs.append((node.name, start, end))
             if len(funcs) > 0:
                 func_map[path] = funcs
-    return save_lines_map(func_map)
+    return save_lines_map(func_map, os.path.join(save_path, "lines_map.json"))
 
 
-def save_lines_map(func_map: dict[str, list[tuple[str, int, int]]], path: str = "../test_cases/lines_map.json") -> dict[str, dict[str, list[tuple[int, int]]]]:
+def save_lines_map(func_map: dict[str, list[tuple[str, int, int]]], path: str = "./test_cases/lines_map.json") -> dict[str, dict[str, list[tuple[int, int]]]]:
     lines = []
     line = {file_path.split("\\")[2]: {name: (start, end) for name, start, end in funcs} for file_path, funcs in func_map.items()}
     lines.append(line)
@@ -42,10 +42,11 @@ class CoverageMapper:
     """
     Tracks function-level coverage for each generated test case using coverage.py.
     """
-    def __init__(self, source_root: str = "..\\Models"):
+    def __init__(self, source_root: str = ".\\Models", save_path: str = "./test_cases/"):
         self.cov = coverage.Coverage(data_file=None, omit=["*/site-packages/*"])
-        self.func_map = build_function_map(source_root)
+        self.func_map = build_function_map(source_root, save_path)
         self.root = source_root
+        self.save_path = save_path
         self.coverage_map: Dict[int, Set[str]] = {}
         self.current_test_id = -1
 
@@ -69,7 +70,7 @@ class CoverageMapper:
         self.coverage_map[self.current_test_id] = covered_funcs
         self.cov.erase()
 
-    def save_map(self, path: str = "../test_cases/coverage_map.json"):
+    def save_map(self, path: str = "./test_cases/coverage_map.json"):
         serializable = {
             tid: sorted(list(funcs))
             for tid, funcs in self.coverage_map.items()

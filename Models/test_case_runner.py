@@ -1,22 +1,16 @@
-import json
 from stable_baselines3 import PPO
 
+from Models.Enumerations.actions import ActionEnum
 from Models.Enumerations.locations import LocationEnum
 from Models.environment_simulation import TaxiGymEnv
-from Models.Enumerations.actions import ActionEnum
 from Models.finite_state_machine import FSM
 
 
 class TestCaseRunner:
-    def __init__(self, model_path: str, test_case_path: str):
+    def __init__(self, model_path: str, test_cases):
         self.env = TaxiGymEnv()
         self.model = PPO.load(model_path, self.env)
-        self.test_cases = json.load(open(test_case_path, "r"))
-
-    #def __init__(self, model_path: str, test_cases: list[dict]):
-    #    self.env = TaxiGymEnv()
-    #    self.model = PPO.load(model_path, self.env)
-    #    self.test_cases = test_cases
+        self.test_cases = test_cases
 
     def run_all(self):
         results = []

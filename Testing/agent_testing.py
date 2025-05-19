@@ -4,7 +4,7 @@ from Models.environment_simulation import TaxiGymEnv
 
 
 env = TaxiGymEnv()
-model = PPO.load("../ppo_elements/models/best_model", env = env)
+model = PPO.load("../ppo_elements/best_model", env = env)
 
 ratio = 0.0
 avg_steps = 0

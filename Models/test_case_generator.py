@@ -1,4 +1,6 @@
 import json
+import os.path
+
 import numpy as np
 from stable_baselines3 import PPO
 
@@ -7,15 +9,14 @@ from Models.coverage_mapper import CoverageMapper
 
 
 class TestCaseGenerator:
-    def __init__(self, agent, env, num_cases=1000):
+    def __init__(self, agent, env):
         self.agent = PPO.load(agent)
         self.env = env
-        self.num_cases = num_cases
         self.test_cases = []
 
-    def generate(self, path: str ="../test_cases/generated_test_cases.json"):
-        mapper = CoverageMapper()
-        for i in range(self.num_cases):
+    def generate(self, num_cases:int = 1000, path: str ="./test_cases/", root: str = ".\\Models"):
+        mapper = CoverageMapper(root, path)
+        for i in range(num_cases):
             mapper.begin_test(i)
             obs, _ = self.env.reset()
             steps = []
@@ -49,6 +50,6 @@ class TestCaseGenerator:
             self.test_cases.append(test_case)
             mapper.end_test()
 
-        mapper.save_map()
-        with open(path, "w") as f:
+        mapper.save_map(os.path.join(path, "coverage_map.json"))
+        with open(os.path.join(path, "generated_test_cases.json"), "w") as f:
             json.dump(self.test_cases, f, indent=4)

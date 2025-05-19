@@ -1,4 +1,5 @@
 import json
+import os.path
 import subprocess
 
 
@@ -9,7 +10,7 @@ def is_git_repo() -> bool:
     return result.stdout.strip() == "true"
 
 
-def get_modified_functions(diff_text: str, lines_map_path: str = "../test_cases/lines_map.json") -> set[str]:
+def get_modified_functions(diff_text: str, lines_map_path: str) -> set[str]:
     modified_funcs = set()
     lines_map = json.load(open(lines_map_path, "r"))
     current_class = ""
@@ -17,7 +18,7 @@ def get_modified_functions(diff_text: str, lines_map_path: str = "../test_cases/
 
     for line in diff_text.splitlines():
         if line.startswith("+++"):
-            if line.endswith(".py") and not (line.__contains__("Testing") or line.__contains__("agent")):
+            if line.endswith(".py") and not (line.__contains__("Testing") or line.__contains__("main")):
                 current_class = line.split("+++")[1].split("/")[2].strip()
                 changed = True
             else:
@@ -49,19 +50,22 @@ def get_diff(path: str, base_commit="HEAD") -> str:
 
 
 class Prioritizer:
-    def __init__(self, test_cases_path: str):
+    def __init__(self, test_cases_path: str, root:str = "./Models"):
         self.test_cases = json.load(open(test_cases_path, "r"))
+        self.root = root
 
-    def prioritize(self) -> list[dict]:
+    def prioritize(self, save_path:str = "./test_cases/") -> list[dict]:
         if not is_git_repo():
             print("Not a git repository.")
             return []
         else:
-            diff = get_diff("..")
-            changed_functions = get_modified_functions(diff)
-            original_functions = json.load(open("../test_cases/coverage_map.json", "r"))
+            diff = get_diff(self.root)
+            changed_functions = get_modified_functions(diff, os.path.join(save_path, "lines_map.json"))
+            original_functions = json.load(open(os.path.join(save_path, "coverage_map.json"), "r"))
 
-            combined = prioritize_tests(self.test_cases, changed_functions, original_functions) + prioritize_classes(changed_functions)
+            combined = (prioritize_tests(self.test_cases, changed_functions, original_functions) +
+                        prioritize_classes(changed_functions, os.path.join(save_path, "lines_map.json"),
+                                            os.path.join(save_path, "classes_coverage.json")))
             combined.sort(reverse=True, key=lambda x: x[0])
             return combined
 
@@ -75,8 +79,7 @@ def prioritize_tests(test_cases: list[dict], modified: set[str],
     scored.sort(reverse=True, key=lambda x: x[0])
     return scored
 
-def prioritize_classes(changed:set[str], lines_path: str = "../test_cases/lines_map.json",
-                       classes_path: str = "../Testing/classes_coverage.json") -> list[dict]:
+def prioritize_classes(changed:set[str], lines_path: str, classes_path: str) -> list[dict]:
     with open(classes_path, "r", encoding="utf-8") as f:
         classes_coverage: dict[str, set[str]] = json.load(f)
 
