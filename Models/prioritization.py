@@ -101,8 +101,8 @@ def prioritize_classes(changed:set[str], lines_path: str, classes_path: str) -> 
                 changed_model_classes.update({method_to_class[m]: 1})
 
     scored = []
-    score = 0
     for test_cls, covered_models in classes_coverage.items():
+        score = 0
         for model in covered_models:
             if model in changed_model_classes:
                 score += changed_model_classes[model]
