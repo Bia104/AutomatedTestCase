@@ -46,7 +46,7 @@ class FSM(StateMachine):
             raise ValueError("Invalid Action")
         return data
 
-def move_case(action: ActionEnum, data: tuple[int, int]) -> (tuple[int, int], bool):
+def move_case(action: ActionEnum, data: tuple[int, int]) -> tuple[tuple[int, int], bool]:
     col, row = data
     match action:
         case ActionEnum.south if col < 4:

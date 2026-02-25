@@ -1,3 +1,5 @@
+from typing import Any, Callable
+
 import numpy as np
 
 import gymnasium
@@ -38,7 +40,7 @@ class TaxiGymEnv(gymnasium.Env):
         self.track = 0
         self.hovering = 0
 
-    def reset(self, *, seed=None, options=None) -> (tuple[int, int], dict[str, str]):
+    def reset(self, *, seed=None, options=None) -> tuple[dict[str, tuple[int, int] | int], dict[str, str | int]]:
         super().reset(seed=seed)
 
         self.final_dest, self.pass_loc = get_random_pickup_and_dropoff()
@@ -59,7 +61,10 @@ class TaxiGymEnv(gymnasium.Env):
                                        "destination": self.fsm.destination.name,
                                        "steps": self.steps}
 
-    def step(self, action_id: int) -> (tuple[int, int], int, bool, bool, dict[str, str]):
+    def step(self, action_id: int) -> tuple[
+                                          dict[str, Callable[[], Any] | Callable[[], Any] | int | Any], int, bool, bool,
+                                          dict[str, str | int]] | tuple[dict[str, Callable[[], Any] | Callable[[], Any] | LocationEnum | int | Any],
+                                          int, bool, bool, dict[str, str | int]]:
 
         old_loc = self.taxi_loc
         action = ActionEnum(action_id)
@@ -103,9 +108,9 @@ class TaxiGymEnv(gymnasium.Env):
             if done:
                 self.pass_loc = self.final_dest
                 if self.steps < 180:
-                    reward = 1000
-                else:
                     reward = 5000
+                else:
+                    reward = 1000
             elif truncated:
                 reward = -5000
 
@@ -165,14 +170,15 @@ def manhattan(a: tuple[int, int], b: tuple[int, int]) -> int:
 def get_random_pickup_and_dropoff() -> tuple[LocationEnum, LocationEnum]:
     valid = [loc for loc in LocationEnum if loc != LocationEnum.InTaxi]
     pickup = np.random.choice(valid)
-    dropoff = np.random.choice([l for l in valid if l != pickup])
+    valid = [l for l in valid if l != pickup]
+    dropoff = np.random.choice(valid)
     return pickup, dropoff
 
 # Check if the taxi is in a new corner
 def new_corner(taxi_loc: tuple[int, int], visited: set[tuple[int, int]]) -> bool:
     return taxi_loc not in visited and taxi_loc in {loc for loc in LocationEnum if loc != LocationEnum.InTaxi}
 
-def closest_unvisited_corner(current_loc, visited):
+def closest_unvisited_corner(current_loc: tuple[int, int], visited: set[tuple[int, int]]):
     unvisited_corners = [loc for loc in LocationEnum if loc != LocationEnum.InTaxi and loc not in visited]
     if not unvisited_corners:
         return float('inf')  # No unvisited corners left

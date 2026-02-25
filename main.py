@@ -2,9 +2,8 @@ from Models.agent_learning import AgentLearning
 from Models.environment_simulation import TaxiGymEnv
 from Models.prioritization import Prioritizer
 from Models.test_case_generator import TestCaseGenerator
-from Models.test_case_runner import TestCaseRunner
 
-MODEL_PATH = "ppo_elements/best_model.zip"
+MODEL_PATH = "ppo_elements/best_model1.zip"
 TEST_CASES_PATH = "test_cases/generated_test_cases.json"
 
 
