@@ -5,7 +5,7 @@ using reinforcement learning (RL), static analysis, and model-based testing tech
 The system is designed to train an RL agent in a game-like environment and use its learned behavior to create 
 intelligent and diverse test cases, followed by a code-coverage-based prioritization system.
 
-## 🧠 Project Overview
+## Project Overview
 
 The project consists of the following major components:
 
@@ -17,7 +17,7 @@ The project consists of the following major components:
 - **Prioritizer**: Uses Git diff and coverage data to re-order test cases by relevance after code changes.
 
 
-## 🧪 Requirements
+## Requirements
 
 - Python 3.10+
 - Gymnasium
@@ -31,3 +31,9 @@ Install requirements:
 
 ```bash
 pip install gymnasium shimmy stable-baselines3 coverage gitpython statemachine
+```
+
+## Usage
+
+Run `main.py` to generate the model and the test cases, saving them in the `ppo_elements` and `test_cases` folders respectively.
+Optionally, after training is complete, run `agent_testing.py` to evaluate the model's performance.
